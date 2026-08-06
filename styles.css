@@ -2,6 +2,7 @@
 :root{--bg:#090b10;--panel:#12151c;--panel2:#1a1f29;--text:#f7f8fa;--muted:#8f98a8;--accent:#ff9f0a;--accent2:#ffc45a;--danger:#ff6961;--line:rgba(255,255,255,.08);--glass:rgba(20,24,32,.78);--key:#1b2029;--keyUtility:#242a35;--safe-top:env(safe-area-inset-top);--safe-bottom:env(safe-area-inset-bottom);--keyboard-bottom-gap:max(8px,calc(var(--safe-bottom) - 18px))}
 
 :root[data-theme="graphite"]{--bg:#090b10;--panel:#12151c;--panel2:#1a1f29;--text:#f7f8fa;--muted:#8f98a8;--accent:#d9a35f;--accent2:#efbd7b;--danger:#e36a65;--line:rgba(255,255,255,.08);--glass:rgba(20,24,32,.80);--key:#1b2029;--keyUtility:#242a35}
+:root[data-theme="gray"]{--bg:#171717;--panel:#202020;--panel2:#2a2a2a;--text:#f3f3f1;--muted:#aaa9a5;--accent:#b8a98f;--accent2:#d1c2a8;--danger:#d77b72;--line:rgba(255,255,255,.09);--glass:rgba(35,35,35,.84);--key:#292929;--keyUtility:#343434}
 :root[data-theme="warm"]{--bg:#12110f;--panel:#1b1916;--panel2:#26231f;--text:#f5f1ea;--muted:#aaa197;--accent:#c8a87d;--accent2:#dec29d;--danger:#d47b72;--line:rgba(255,245,230,.08);--glass:rgba(29,26,22,.82);--key:#24211d;--keyUtility:#302c27}
 :root[data-theme="light"]{--bg:#eef1f6;--panel:#fff;--panel2:#f3f5f8;--text:#111318;--muted:#687080;--accent:#e98700;--accent2:#ffae2b;--danger:#d92e2e;--line:rgba(20,25,35,.10);--glass:rgba(255,255,255,.82);--key:#fff;--keyUtility:#e7eaf0}
 @media(prefers-color-scheme:light){:root:not([data-theme]){--bg:#eef1f6;--panel:#fff;--panel2:#f3f5f8;--text:#111318;--muted:#687080;--accent:#e98700;--accent2:#ffae2b;--danger:#d92e2e;--line:rgba(20,25,35,.10);--glass:rgba(255,255,255,.82);--key:#fff;--keyUtility:#e7eaf0}}
@@ -34,3 +35,10 @@
 
 /* Uporządkowane ustawienia 1.1.1 */
 .settings{padding:12px;display:flex;flex-direction:column;gap:10px;overflow:auto}.settings-group{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.022);overflow:hidden}.settings-group>summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 12px;padding:15px 16px;min-height:62px;user-select:none;-webkit-user-select:none}.settings-group>summary::-webkit-details-marker{display:none}.settings-group>summary span{font-size:16px;font-weight:720}.settings-group>summary small{grid-column:1;color:var(--muted);font-size:12px}.settings-group>summary::after{content:"⌄";grid-column:2;grid-row:1 / span 2;color:var(--muted);font-size:20px;transition:transform .2s ease}.settings-group[open]>summary::after{transform:rotate(180deg)}.settings-group[open]>summary{border-bottom:1px solid var(--line)}.settings-group-body{display:grid;gap:16px;padding:15px}.settings-group-body label{margin:0}.settings-group-body select{width:100%}.settings-actions{display:grid;gap:8px}.backup-status{padding:2px 0 4px}.settings-section{border-top:0;padding-top:0;margin-top:0}@media(max-height:720px){.settings-group>summary{min-height:56px;padding:12px 14px}.settings-group-body{padding:13px;gap:13px}}
+
+/* Grana 1.1.5 — neutralny szary i pewna blokada zaznaczania historii */
+:root[data-theme="gray"] .app{background:radial-gradient(circle at 75% 8%,rgba(184,169,143,.07),transparent 32%),var(--bg)}
+:root[data-theme="gray"] .display-glow{background:rgba(184,169,143,.09)}
+:root[data-theme="gray"] .keypad .operator{background:linear-gradient(180deg,#383838,#2f2f2f)}
+.history-list,.history-item,.history-item *{user-select:none!important;-webkit-user-select:none!important;-webkit-touch-callout:none!important}
+.history-item{-webkit-user-drag:none;cursor:default}
