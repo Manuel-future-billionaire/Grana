@@ -24,7 +24,7 @@
     <section class="display" aria-live="polite">
       <div class="display-glow" aria-hidden="true"></div>
       <div id="expression" class="expression" role="textbox" aria-label="Edytowane obliczenie" tabindex="0"></div>
-      <div id="result" class="result">0</div>
+      <div class="result-row"><div id="result" class="result">0</div><span id="resultCheck" class="result-check" aria-hidden="true">✓</span></div>
     </section>
 
     <section class="recent" aria-label="Ostatnie obliczenia">
@@ -53,16 +53,18 @@
   <div class="drawer-head"><h2>Ustawienia</h2><button id="closeSettings" class="close">×</button></div>
   <div class="settings">
     <label>Przechowuj historię
-      <select id="retention"><option value="14">14 dni</option><option value="30">30 dni</option><option value="90">90 dni</option><option value="0">Bez limitu</option></select>
+      <select id="retention"><option value="0" selected>Bez limitu</option><option value="14">14 dni</option><option value="30">30 dni</option><option value="90">90 dni</option></select>
     </label>
     <label>Liczba miejsc po przecinku
       <select id="precision"><option>2</option><option>4</option><option selected>8</option><option>12</option></select>
     </label>
     <label>Wygląd
-      <select id="appearance"><option value="system">Systemowy</option><option value="dark">Ciemny</option><option value="light">Jasny</option></select>
+      <select id="appearance"><option value="system">Systemowy</option><option value="graphite">Grafitowy</option><option value="navy">Granatowy</option><option value="warm">Ciepły szary</option><option value="light">Jasny</option></select>
     </label>
     <label class="switch"><span>Wynik na żywo</span><input id="liveResult" type="checkbox" checked></label>
     <label class="switch"><span>Separator tysięcy</span><input id="thousandsSeparator" type="checkbox" checked></label>
+    <label class="switch"><span>Wibracje</span><input id="haptics" type="checkbox"></label>
+    <label class="switch"><span>Szybkie animacje</span><input id="animations" type="checkbox" checked></label>
     <button id="exportBtn" class="secondary full">Eksportuj historię</button>
     <button id="importBtn" class="secondary full">Importuj historię</button>
     <input id="importFile" type="file" accept="application/json" hidden>
