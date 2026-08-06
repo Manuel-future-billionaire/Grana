@@ -3,11 +3,11 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-  <meta name="theme-color" content="#15171b">
+  <meta name="theme-color" content="#1b1916">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Kalkulator">
-  <title>Kalkulator Kantor</title>
+  <title>Kalkulator Kantor 1.1</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="stylesheet" href="styles.css">
@@ -59,15 +59,23 @@
       <select id="precision"><option>2</option><option>4</option><option selected>8</option><option>12</option></select>
     </label>
     <label>Wygląd
-      <select id="appearance"><option value="system">Systemowy</option><option value="graphite">Grafitowy</option><option value="navy">Granatowy</option><option value="warm">Ciepły szary</option><option value="light">Jasny</option></select>
+      <select id="appearance"><option value="system">Systemowy</option><option value="graphite">Grafitowy</option><option value="warm" selected>Ciepły szary</option><option value="light">Jasny</option></select>
     </label>
     <label class="switch"><span>Wynik na żywo</span><input id="liveResult" type="checkbox" checked></label>
     <label class="switch"><span>Separator tysięcy</span><input id="thousandsSeparator" type="checkbox" checked></label>
-    <label class="switch"><span>Wibracje</span><input id="haptics" type="checkbox"></label>
     <label class="switch"><span>Animacje</span><input id="animations" type="checkbox" checked></label>
-    <button id="exportBtn" class="secondary full">Eksportuj historię</button>
-    <button id="importBtn" class="secondary full">Importuj historię</button>
-    <input id="importFile" type="file" accept="application/json" hidden>
+    <section class="settings-section backup-section">
+      <h3>Kopie zapasowe</h3>
+      <label class="switch"><span>Przypominaj o kopii</span><input id="backupReminder" type="checkbox"></label>
+      <label id="backupIntervalRow">Przypominaj
+        <select id="backupInterval"><option value="1">Codziennie</option><option value="3">Co 3 dni</option><option value="7" selected>Co 7 dni</option><option value="14">Co 14 dni</option><option value="30">Co 30 dni</option></select>
+      </label>
+      <div class="backup-status"><span>Ostatnia kopia</span><strong id="lastBackup">Nigdy</strong></div>
+      <button id="backupNowBtn" class="secondary full">Utwórz kopię (.kcalc)</button>
+      <button id="csvBtn" class="secondary full">Eksportuj CSV</button>
+      <button id="importBtn" class="secondary full">Importuj kopię (.kcalc)</button>
+      <input id="importFile" type="file" accept=".kcalc,application/json,application/octet-stream" hidden>
+    </section>
   </div>
 </aside>
 
@@ -78,9 +86,16 @@
 <div id="contextMenu" class="context-menu hidden" role="menu">
   <button data-menu="use">Użyj ponownie</button>
   <button data-menu="copy">Kopiuj całe obliczenie</button>
+  <button data-menu="send">Wyślij</button>
   <button data-menu="note">Dodaj / edytuj notatkę</button>
   <button data-menu="edit">Edytuj zapisane obliczenie</button>
   <button data-menu="delete" class="danger-text">Usuń</button>
+</div>
+
+<div id="sendMenu" class="context-menu hidden" role="menu" aria-label="Wybierz sposób wysłania">
+  <button data-send="sms"><strong>SMS</strong><span class="menu-subtitle">Treść wiadomości</span></button>
+  <button data-send="mms"><strong>MMS</strong><span class="menu-subtitle">Obraz z obliczeniem i datą</span></button>
+  <button data-send="cancel" class="muted-action">Anuluj</button>
 </div>
 
 <dialog id="textDialog">
@@ -90,6 +105,10 @@
     <div class="dialog-actions"><button value="cancel" class="secondary">Anuluj</button><button id="dialogSave" value="default">Zapisz</button></div>
   </form>
 </dialog>
+<div id="backupPrompt" class="backup-prompt hidden" role="dialog" aria-label="Przypomnienie o kopii zapasowej">
+  <div><strong>Czas utworzyć kopię zapasową</strong><span id="backupPromptText"></span></div>
+  <div class="backup-prompt-actions"><button id="backupLater" class="secondary">Później</button><button id="backupPromptNow">Utwórz kopię</button></div>
+</div>
 <div id="toast" class="toast hidden"></div>
 <script src="app.js"></script>
 </body>
