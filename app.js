@@ -118,11 +118,10 @@ function calculationImageFile(x){
   ctx.fillStyle=bg;ctx.fillRect(0,0,canvas.width,canvas.height);
   ctx.fillStyle=panel;ctx.beginPath();ctx.roundRect(72,72,1056,656,42);ctx.fill();
   ctx.fillStyle=accent;ctx.fillRect(72,72,12,656);
-  ctx.fillStyle=muted;ctx.font='500 34px -apple-system, BlinkMacSystemFont, sans-serif';ctx.fillText('KALKULATOR KANTOR',126,145);
-  ctx.fillStyle=text;ctx.font='500 64px -apple-system, BlinkMacSystemFont, sans-serif';
-  const lines=wrapCanvasText(ctx,extractExpression(x.expression),930).slice(0,3);let y=250;
+    ctx.fillStyle=text;ctx.font='500 64px -apple-system, BlinkMacSystemFont, sans-serif';
+  const lines=wrapCanvasText(ctx,extractExpression(x.expression),930).slice(0,3);let y=205;
   for(const line of lines){ctx.fillText(line,126,y);y+=78}
-  ctx.fillStyle=text;ctx.font='700 96px -apple-system, BlinkMacSystemFont, sans-serif';ctx.fillText(`Suma: ${historyResult(x)}`,126,535);
+  ctx.fillStyle=text;ctx.font='700 96px -apple-system, BlinkMacSystemFont, sans-serif';ctx.fillText(`Suma: ${historyResult(x)}`,126,520);
   const d=new Date(x.created);const date=new Intl.DateTimeFormat('pl-PL',{dateStyle:'long'}).format(d);const time=new Intl.DateTimeFormat('pl-PL',{timeStyle:'medium'}).format(d);
   ctx.fillStyle=muted;ctx.font='500 36px -apple-system, BlinkMacSystemFont, sans-serif';ctx.fillText(`${date}, ${time}`,126,650);
   return new Promise((resolve,reject)=>canvas.toBlob(blob=>blob?resolve(new File([blob],`obliczenie-${d.toISOString().slice(0,19).replace(/[:T]/g,'-')}.png`,{type:'image/png'})):reject(new Error('Nie udało się utworzyć obrazu')),'image/png',0.95));
@@ -146,6 +145,25 @@ function toast(t){const e=$('#toast');e.textContent=t;e.classList.remove('hidden
 function openDrawer(which){closeMenu();$('#drawerBackdrop').classList.remove('hidden');which.classList.add('open');which.setAttribute('aria-hidden','false');renderHistory()}
 function closeDrawers(){for(const d of $$('.drawer')){d.classList.remove('open');d.setAttribute('aria-hidden','true')}$('#drawerBackdrop').classList.add('hidden')}
 
+// Gesty poziome: kalkulator ↔ historia / ustawienia.
+// Rozpoznajemy wyłącznie zdecydowany ruch poziomy, aby nie kolidował
+// z przewijaniem list i obsługą przycisków.
+function bindHorizontalSwipe(element,{right,left}){
+  let startX=0,startY=0,tracking=false;
+  const blocked='button,select,input,textarea,a,dialog,.context-menu,#expression,#result';
+  element.addEventListener('touchstart',e=>{
+    if(e.touches.length!==1||e.target.closest(blocked)){tracking=false;return}
+    const t=e.touches[0];startX=t.clientX;startY=t.clientY;tracking=true;
+  },{passive:true});
+  element.addEventListener('touchend',e=>{
+    if(!tracking||e.changedTouches.length!==1)return;tracking=false;
+    const t=e.changedTouches[0],dx=t.clientX-startX,dy=t.clientY-startY;
+    if(Math.abs(dx)<72||Math.abs(dx)<Math.abs(dy)*1.35)return;
+    if(dx>0)right?.();else left?.();
+  },{passive:true});
+  element.addEventListener('touchcancel',()=>{tracking=false},{passive:true});
+}
+
 expressionInput.addEventListener('pointerdown',e=>{e.preventDefault();placeCursorFromPoint(e.clientX)});expressionInput.addEventListener('contextmenu',e=>e.preventDefault());
 let deleteDelay=null,deleteRepeat=null;
 function stopDeleteRepeat(){clearTimeout(deleteDelay);clearInterval(deleteRepeat);deleteDelay=deleteRepeat=null}
@@ -153,6 +171,9 @@ $('#keypad').addEventListener('pointerdown',e=>{const b=e.target.closest('button
 for(const ev of ['pointerup','pointercancel','pointerleave'])$('#keypad').addEventListener(ev,stopDeleteRepeat);
 $('#keypad').addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.dataset.action==='backspace')return;b.dataset.token?insertText(b.dataset.token):pressAction(b.dataset.action)});
 $('#historyBtn').onclick=()=>openDrawer($('#historyDrawer'));$('#openFullHistory').onclick=()=>openDrawer($('#historyDrawer'));$('#settingsBtn').onclick=()=>openDrawer($('#settingsDrawer'));$('#closeHistory').onclick=closeDrawers;$('#closeSettings').onclick=closeDrawers;$('#drawerBackdrop').onclick=closeDrawers;
+bindHorizontalSwipe($('#app'),{right:()=>openDrawer($('#historyDrawer')),left:()=>openDrawer($('#settingsDrawer'))});
+bindHorizontalSwipe($('#historyDrawer'),{left:closeDrawers});
+bindHorizontalSwipe($('#settingsDrawer'),{right:closeDrawers});
 $('#contextMenu').onclick=e=>{const b=e.target.closest('button');if(b)menuAction(b.dataset.menu)};$('#sendMenu').onclick=e=>{const b=e.target.closest('button');if(!b)return;const x=entry();if(b.dataset.send==='sms'&&x)sendSms(x);else if(b.dataset.send==='mms'&&x)sendMms(x);else closeSendMenu()};$('#displayMenu').onclick=e=>{const b=e.target.closest('button');if(b?.dataset.displayMenu==='paste'){pasteIntoCalculator();closeDisplayMenu()}};bindDisplayLongPress($('#result'));document.addEventListener('pointerdown',e=>{if(!e.target.closest('#contextMenu')&&!e.target.closest('.history-item'))closeMenu();if(!e.target.closest('#sendMenu')&&!e.target.closest('[data-menu="send"]'))closeSendMenu();if(!e.target.closest('#displayMenu')&&!e.target.closest('#result'))closeDisplayMenu()});
 $('#dialogSave').onclick=saveDialog;$('#clearHistory').onclick=()=>{if(confirm('Usunąć całą historię?')){state.history=[];save();renderHistory()}};
 syncSettingsUi();
@@ -170,7 +191,7 @@ async function digestText(text){
   return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 function backupPayload(){
-  return {format:BACKUP_FORMAT,version:BACKUP_VERSION,createdAt:new Date().toISOString(),app:{name:'Kalkulator Kantor',version:'1.1.0'},data:{history:state.history,settings:{retention:state.retention,precision:state.precision,liveResult:state.liveResult,thousandsSeparator:state.thousandsSeparator,appearance:state.appearance,animations:state.animations,backupReminder:state.backupReminder,backupInterval:state.backupInterval}}};
+  return {format:BACKUP_FORMAT,version:BACKUP_VERSION,createdAt:new Date().toISOString(),app:{name:'Kalkulator Kantor',version:'1.1.2'},data:{history:state.history,settings:{retention:state.retention,precision:state.precision,liveResult:state.liveResult,thousandsSeparator:state.thousandsSeparator,appearance:state.appearance,animations:state.animations,backupReminder:state.backupReminder,backupInterval:state.backupInterval}}};
 }
 async function createBackup(){
   const payload=backupPayload(),canonical=JSON.stringify(payload.data),checksum=await digestText(canonical);

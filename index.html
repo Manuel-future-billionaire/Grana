@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Kalkulator">
-  <title>Kalkulator Kantor 1.1</title>
+  <title>Kalkulator Kantor 1.1.2</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <link rel="stylesheet" href="styles.css">
@@ -52,30 +52,46 @@
 <aside id="settingsDrawer" class="drawer right" aria-hidden="true">
   <div class="drawer-head"><h2>Ustawienia</h2><button id="closeSettings" class="close">×</button></div>
   <div class="settings">
-    <label>Przechowuj historię
-      <select id="retention"><option value="0" selected>Bez limitu</option><option value="14">14 dni</option><option value="30">30 dni</option><option value="90">90 dni</option></select>
-    </label>
-    <label>Liczba miejsc po przecinku
-      <select id="precision"><option>2</option><option>4</option><option selected>8</option><option>12</option></select>
-    </label>
-    <label>Wygląd
-      <select id="appearance"><option value="system">Systemowy</option><option value="graphite">Grafitowy</option><option value="warm" selected>Ciepły szary</option><option value="light">Jasny</option></select>
-    </label>
-    <label class="switch"><span>Wynik na żywo</span><input id="liveResult" type="checkbox" checked></label>
-    <label class="switch"><span>Separator tysięcy</span><input id="thousandsSeparator" type="checkbox" checked></label>
-    <label class="switch"><span>Animacje</span><input id="animations" type="checkbox" checked></label>
-    <section class="settings-section backup-section">
-      <h3>Kopie zapasowe</h3>
-      <label class="switch"><span>Przypominaj o kopii</span><input id="backupReminder" type="checkbox"></label>
-      <label id="backupIntervalRow">Przypominaj
-        <select id="backupInterval"><option value="1">Codziennie</option><option value="3">Co 3 dni</option><option value="7" selected>Co 7 dni</option><option value="14">Co 14 dni</option><option value="30">Co 30 dni</option></select>
-      </label>
-      <div class="backup-status"><span>Ostatnia kopia</span><strong id="lastBackup">Nigdy</strong></div>
-      <button id="backupNowBtn" class="secondary full">Utwórz kopię (.kcalc)</button>
-      <button id="csvBtn" class="secondary full">Eksportuj CSV</button>
-      <button id="importBtn" class="secondary full">Importuj kopię (.kcalc)</button>
-      <input id="importFile" type="file" accept=".kcalc,application/json,application/octet-stream" hidden>
-    </section>
+    <details class="settings-group" open>
+      <summary><span>Obliczenia</span><small>Historia i sposób liczenia</small></summary>
+      <div class="settings-group-body">
+        <label>Przechowuj historię
+          <select id="retention"><option value="0" selected>Bez limitu</option><option value="14">14 dni</option><option value="30">30 dni</option><option value="90">90 dni</option></select>
+        </label>
+        <label>Liczba miejsc po przecinku
+          <select id="precision"><option>2</option><option>4</option><option selected>8</option><option>12</option></select>
+        </label>
+        <label class="switch"><span>Wynik na żywo</span><input id="liveResult" type="checkbox" checked></label>
+        <label class="switch"><span>Separator tysięcy</span><input id="thousandsSeparator" type="checkbox" checked></label>
+      </div>
+    </details>
+
+    <details class="settings-group">
+      <summary><span>Wygląd</span><small>Motyw i animacje</small></summary>
+      <div class="settings-group-body">
+        <label>Motyw
+          <select id="appearance"><option value="system">Systemowy</option><option value="graphite">Grafitowy</option><option value="warm" selected>Ciepły szary</option><option value="light">Jasny</option></select>
+        </label>
+        <label class="switch"><span>Animacje</span><input id="animations" type="checkbox" checked></label>
+      </div>
+    </details>
+
+    <details class="settings-group backup-section">
+      <summary><span>Kopie zapasowe</span><small>Eksport, import i przypomnienia</small></summary>
+      <div class="settings-group-body">
+        <label class="switch"><span>Przypominaj o kopii</span><input id="backupReminder" type="checkbox"></label>
+        <label id="backupIntervalRow">Częstotliwość przypomnienia
+          <select id="backupInterval"><option value="1">Codziennie</option><option value="3">Co 3 dni</option><option value="7" selected>Co 7 dni</option><option value="14">Co 14 dni</option><option value="30">Co 30 dni</option></select>
+        </label>
+        <div class="backup-status"><span>Ostatnia kopia</span><strong id="lastBackup">Nigdy</strong></div>
+        <div class="settings-actions">
+          <button id="backupNowBtn" class="secondary full">Utwórz kopię (.kcalc)</button>
+          <button id="csvBtn" class="secondary full">Eksportuj CSV</button>
+          <button id="importBtn" class="secondary full">Importuj kopię (.kcalc)</button>
+        </div>
+        <input id="importFile" type="file" accept=".kcalc,application/json,application/octet-stream" hidden>
+      </div>
+    </details>
   </div>
 </aside>
 
