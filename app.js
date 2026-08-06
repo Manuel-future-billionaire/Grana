@@ -28,6 +28,8 @@ function applyPreferences(){
   if(mode==='system')document.documentElement.removeAttribute('data-theme');
   else document.documentElement.setAttribute('data-theme',mode);
   document.documentElement.toggleAttribute('data-no-animations',!state.animations);
+  const themeColors={system:'#15171b',graphite:'#12151c',navy:'#111a25',warm:'#1b1916',light:'#eef1f6'};
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content',themeColors[mode]||themeColors.system);
 }
 function haptic(pattern=12){if(state.haptics&&navigator.vibrate)navigator.vibrate(pattern)}
 function id(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
@@ -74,8 +76,7 @@ function render(){renderExpression();let r='0';if(expression&&state.liveResult){
 function insertText(text){const start=cursorPos;let token=text;const operators='+−×÷';if(operators.includes(token)&&start>0&&operators.includes(expression[start-1])){expression=expression.slice(0,start-1)+token+expression.slice(start);cursorPos=start;render();return}if(token===','){const left=expression.slice(0,start),tail=left.split(/[+−×÷()]/).at(-1);if(tail.includes(','))return;if(!tail||!(/\d$/.test(tail)))token='0,'}expression=expression.slice(0,start)+token+expression.slice(start);cursorPos=start+token.length;render()}
 function backspace(){if(cursorPos>0){expression=expression.slice(0,cursorPos-1)+expression.slice(cursorPos);cursorPos--}render()}
 function placeCursorFromPoint(clientX){if(!expression){cursorPos=0;render();return}const chars=[...expressionInput.querySelectorAll('.editor-char,.editor-separator')];let best=expression.length,bestDist=Infinity;for(const ch of chars){const r=ch.getBoundingClientRect(),mid=r.left+r.width/2,before=Number(ch.dataset.before),after=Number(ch.dataset.after),pos=clientX<mid?before:after,edge=clientX<mid?r.left:r.right,d=Math.abs(clientX-edge);if(d<bestDist){bestDist=d;best=pos}}cursorPos=Math.max(0,Math.min(best,expression.length));render()}
-function flashConfirmation(){if(!state.animations)return;const el=$('#resultCheck');el.classList.remove('show');void el.offsetWidth;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),120)}
-function calculate(saveHistory=true){if(!expression)return;try{const original=expression,v=evaluate(expression);lastResult=v;if(saveHistory)addHistory(original,v);expression=editableNumber(v);cursorPos=expression.length;render();flashConfirmation();haptic(10)}catch(e){toast(e.message||'Nieprawidłowe działanie')}}
+function calculate(saveHistory=true){if(!expression)return;try{const original=expression,v=evaluate(expression);lastResult=v;if(saveHistory)addHistory(original,v);expression=editableNumber(v);cursorPos=expression.length;render();haptic(10)}catch(e){toast(e.message||'Nieprawidłowe działanie')}}
 function addHistory(expr,value){const now=Date.now(),entryId=id();state.history.unshift({id:entryId,expression:extractExpression(expr),result:format(value),resultValue:value,created:now,updated:now,comment:''});addedId=entryId;cleanOld();save();renderHistory();renderRecent();setTimeout(()=>addedId=null,100)}
 async function pasteIntoCalculator(){try{let text=(await navigator.clipboard.readText()).trim();if(!text)throw 0;const firstLine=text.split(/\r?\n/)[0],candidate=extractExpression(firstLine);evaluate(candidate);insertText(candidate);toast('Wklejono obliczenie')}catch{toast('Safari nie udostępniło schowka')}}
 function pressAction(a){if(a==='clear'){expression='';lastResult=0;cursorPos=0;render()}else if(a==='backspace')backspace();else if(a==='equals')calculate()}
