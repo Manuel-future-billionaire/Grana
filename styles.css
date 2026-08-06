@@ -14,7 +14,7 @@
 @media(max-height:720px){.topbar{height:44px;flex-basis:44px}.calculator{padding-bottom:4px}.display{flex-basis:146px;min-height:146px;padding-top:12px}.expression{font-size:29px;min-height:0}.result{font-size:54px}.recent{flex-basis:92px}.recent-list{grid-template-rows:repeat(3,22px)}.recent-item{min-height:22px;font-size:14px}.recent-item .recent-expr{font-size:14px}.recent-item .recent-result{font-size:15px}.keypad{gap:5px;margin-top:6px;grid-template-rows:repeat(5,minmax(39px,1fr))}.keypad button{min-height:39px;border-radius:15px;font-size:22px}}
 @media(min-width:700px){.calculator{padding-left:18px;padding-right:18px}}
 
-/* Kalkulator Kantor 1.0 — finalne dopracowanie ergonomii */
+/* Grana 1.0 — finalne dopracowanie ergonomii */
 .result-row{position:relative;display:flex;align-items:flex-end;min-width:0}.result-row .result{flex:1;min-width:0}
 .editor-separator{display:inline;opacity:.72}.item-enter{animation:itemEnter .20s ease-out}@keyframes itemEnter{from{opacity:.45;transform:translateY(3px)}to{opacity:1;transform:none}}
 .drawer{transition:transform .22s ease-out}.backdrop{animation:backdropIn .18s linear}@keyframes backdropIn{from{opacity:0}to{opacity:1}}.context-menu{animation:menuIn .19s ease-out}@keyframes menuIn{from{opacity:.5;transform:scale(.985)}to{opacity:1;transform:scale(1)}}

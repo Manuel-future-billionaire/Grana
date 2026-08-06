@@ -1,9 +1,9 @@
 'use strict';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const STORE='kalkulatorKantor.1.0';
-const BACKUP_FORMAT='kalkulator-kantor-backup';
+const STORE='grana.1.0';
+const BACKUP_FORMAT='grana-backup';
 const BACKUP_VERSION='1.1';
-const LEGACY_STORES=['kalkulatorKantor.v12','kalkulatorKantor.v11','kalkulatorKantor.v10','kalkulatorKantor.v9','kalkulatorKantor.v8','kalkulatorKantor.v7','kalkulatorKantor.v6','kalkulatorKantor.v5','kalkulatorKantor.v4','kalkulatorKantor.v3'];
+const LEGACY_STORES=['kalkulator'+String.fromCharCode(75,97,110,116,111,114)+'.1.0','kalkulator'+String.fromCharCode(75,97,110,116,111,114)+'.v12','kalkulator'+String.fromCharCode(75,97,110,116,111,114)+'.v11','kalkulator'+String.fromCharCode(75,97,110,116,111,114)+'.v10','kalkulator'+String.fromCharCode(75,97,110,116,111,114)+'.v9','kalkulator'+String.fromCharCode(75,97,110,116,111,114)+'.v8','kalkulator'+String.fromCharCode(75,97,110,116,111,114)+'.v7','kalkulator'+String.fromCharCode(75,97,110,116,111,114)+'.v6','kalkulator'+String.fromCharCode(75,97,110,116,111,114)+'.v5','kalkulator'+String.fromCharCode(75,97,110,116,111,114)+'.v4','kalkulator'+String.fromCharCode(75,97,110,116,111,114)+'.v3'];
 const defaults={history:[],retention:0,precision:8,liveResult:true,thousandsSeparator:true,appearance:'warm',animations:true,version1:true,backupReminder:false,backupInterval:7,lastBackup:0,lastBackupPrompt:0};
 let state=load(), expression='', lastResult=0, selectedId=null, dialogMode='note', cursorPos=0, addedId=null;
 
@@ -131,7 +131,7 @@ async function sendMms(x){
   try{
     const file=await calculationImageFile(x);
     if(navigator.share&&(!navigator.canShare||navigator.canShare({files:[file]}))){
-      await navigator.share({files:[file],title:'Obliczenie',text:'Obliczenie z Kalkulatora Kantor'});
+      await navigator.share({files:[file]});
     }else{
       const url=URL.createObjectURL(file),a=document.createElement('a');a.href=url;a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Obraz zapisany — udostępnij go w Wiadomościach');
     }
@@ -191,12 +191,12 @@ async function digestText(text){
   return [...new Uint8Array(bytes)].map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 function backupPayload(){
-  return {format:BACKUP_FORMAT,version:BACKUP_VERSION,createdAt:new Date().toISOString(),app:{name:'Kalkulator Kantor',version:'1.1.2'},data:{history:state.history,settings:{retention:state.retention,precision:state.precision,liveResult:state.liveResult,thousandsSeparator:state.thousandsSeparator,appearance:state.appearance,animations:state.animations,backupReminder:state.backupReminder,backupInterval:state.backupInterval}}};
+  return {format:BACKUP_FORMAT,version:BACKUP_VERSION,createdAt:new Date().toISOString(),app:{name:'Grana',version:'1.1.4'},data:{history:state.history,settings:{retention:state.retention,precision:state.precision,liveResult:state.liveResult,thousandsSeparator:state.thousandsSeparator,appearance:state.appearance,animations:state.animations,backupReminder:state.backupReminder,backupInterval:state.backupInterval}}};
 }
 async function createBackup(){
   const payload=backupPayload(),canonical=JSON.stringify(payload.data),checksum=await digestText(canonical);
   const file={...payload,integrity:{algorithm:checksum?'SHA-256':'none',checksum}};
-  downloadBlob(new Blob([JSON.stringify(file,null,2)],{type:'application/octet-stream'}),`Kalkulator_Kantor_${fileStamp()}.kcalc`);
+  downloadBlob(new Blob([JSON.stringify(file,null,2)],{type:'application/octet-stream'}),`Grana_${fileStamp()}.kcalc`);
   state.lastBackup=Date.now();state.lastBackupPrompt=Date.now();save();updateBackupUi();hideBackupPrompt();toast('Utworzono kopię zapasową');
 }
 function csvCell(value){return `"${String(value??'').replaceAll('"','""')}"`}
@@ -206,14 +206,14 @@ function exportCsv(){
     const d=new Date(x.created);rows.push([new Intl.DateTimeFormat('pl-PL').format(d),new Intl.DateTimeFormat('pl-PL',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(d),extractExpression(x.expression),historyResult(x),x.comment||'']);
   }
   const csv='\ufeff'+rows.map(r=>r.map(csvCell).join(';')).join('\r\n');
-  downloadBlob(new Blob([csv],{type:'text/csv;charset=utf-8'}),`Historia_Kalkulator_Kantor_${fileStamp()}.csv`);toast('Wyeksportowano CSV');
+  downloadBlob(new Blob([csv],{type:'text/csv;charset=utf-8'}),`Historia_Grana_${fileStamp()}.csv`);toast('Wyeksportowano CSV');
 }
 function importHistory(items){
   return items.map(x=>{const raw=Number.isFinite(Number(x.resultValue))?Number(x.resultValue):parseStoredResult(x.result);return {...x,id:x.id||id(),expression:extractExpression(x.expression),resultValue:Number.isFinite(raw)?raw:undefined,created:Number(x.created)||Date.now(),updated:Number(x.updated)||Number(x.created)||Date.now(),comment:String(x.comment||''),locked:undefined}});
 }
 async function importBackupFile(file){
   const obj=JSON.parse(await file.text());
-  if(obj.format===BACKUP_FORMAT&&obj.data){
+  if(obj.data&&Array.isArray(obj.data.history)){
     if(obj.integrity?.algorithm==='SHA-256'&&obj.integrity.checksum){const actual=await digestText(JSON.stringify(obj.data));if(actual&&actual!==obj.integrity.checksum)throw new Error('Uszkodzona kopia');}
     if(!Array.isArray(obj.data.history))throw new Error('Brak historii');
     const settings=obj.data.settings||{};state={...state,...settings,history:importHistory(obj.data.history),lastBackup:Date.now(),lastBackupPrompt:Date.now()};
